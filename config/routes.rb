@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   root "works#root"
   
   # Routes for OAuth login and logout
+  get "/login", to: "users#login_form", as: "login"
   get "/auth/github", as: "github_login"
   get "/auth/:provider/callback", to: "users#create", as: "omniauth_callback"
   delete "/logout" to: "users#destroy", as: "logout"
