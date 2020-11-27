@@ -1,12 +1,22 @@
 class UsersController < ApplicationController
   before_action :auth_hash, only: [:create]
+
   def index
     @users = User.all
+    if @user.nil?
+      flash[:result_text] = "You must log in to do that"
+      return redirect_to root_path
+    end
   end
 
   def show
-    @user = User.find_by(id: params[:id])
-    render_404 unless @user
+    @exist_user = User.find_by(id: params[:id])
+    return render_404 unless @exist_user
+
+    if @user.nil?
+      flash[:result_text] = "You must log in to do that"
+      return redirect_to root_path
+    end
   end
 
   def create
