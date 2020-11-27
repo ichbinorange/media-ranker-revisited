@@ -5,7 +5,7 @@ Spring.watch(
   "tmp/caching-dev.txt"
 )
 
-if EVN['RAILS_ENV'] == 'test'
+if ENV['RAILS_ENV'] == 'test'
   require 'simplecov'
   SimpleCov.start 'rails'
-end]
+end
