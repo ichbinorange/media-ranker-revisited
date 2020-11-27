@@ -205,6 +205,7 @@ describe WorksController do
 
     it "redirects to the work page after the user has logged out" do
       skip
+      # user logged out and redirect is not related to upvote?
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
