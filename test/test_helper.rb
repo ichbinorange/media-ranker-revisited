@@ -3,6 +3,8 @@ require_relative '../config/environment'
 require 'rails/test_help'
 require "minitest/rails"
 require "minitest/reporters"  # for Colorized output
+require 'simplecov' # for SimpleCov
+
 #  For colorful output!
 Minitest::Reporters.use!(
   Minitest::Reporters::SpecReporter.new,
@@ -10,7 +12,6 @@ Minitest::Reporters.use!(
   Minitest.backtrace_filter
 )
 
-require 'simplecov'
 SimpleCov.start 'rails' do
   add_filter '/bin/'
   add_filter '/db/'
@@ -51,7 +52,7 @@ class ActiveSupport::TestCase
     OmniAuth.config.mock_auth[:github] = OmniAuth::AuthHash.new(mock_auth_hash(user))
     get omniauth_callback_path(:github)
 
-    user = User.find_by(uid: user.uid, name: user.username)
+    user = User.find_by(uid: user.uid, username: user.username)
     expect(user).wont_be_nil
 
     expect(session[:user_id]).must_equal user.id
