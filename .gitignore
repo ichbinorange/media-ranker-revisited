@@ -15,3 +15,14 @@
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore auto generated files
+.generators
+.idea/
+.env
+
+# Ignore simplecov
+coverage/*
+
+# Ignore ds.store
+.DS_Store
