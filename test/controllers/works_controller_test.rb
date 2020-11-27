@@ -189,19 +189,57 @@ describe WorksController do
 
   describe "upvote" do
     it "redirects to the work page if no user is logged in" do
-      skip
+      # Arrange
+      work = works(:album)
+      before_vote = work.vote_count
+
+      # Act
+      post upvote_path(work)
+
+      # Assert
+      work.reload
+      expect(session[:user_id]).must_be_nil
+      expect(work.vote_count).must_equal before_vote
+      must_redirect_to work_path(work)
     end
 
     it "redirects to the work page after the user has logged out" do
       skip
+      # user logged out and redirect is not related to upvote?
     end
 
     it "succeeds for a logged-in user and a fresh user-vote pair" do
-      skip
+      # Arrange
+      # kari hasn't voted another_album
+      user = perform_login(users(:kari))
+      work = works(:another_album)
+      vote_count = work.vote_count
+  
+      # Act
+      post upvote_path(work)
+
+      # Assert
+      work.reload
+      expect(session[:user_id]).must_equal user.id
+      expect(work.vote_count).must_equal (vote_count + 1)
+      must_redirect_to work_path(work)
     end
 
     it "redirects to the work page if the user has already voted for that work" do
-      skip
+      # Arrange
+      # dan already voted album
+      user = perform_login(users(:dan))
+      work = works(:album)
+      before_vote = work.vote_count
+
+      # Act
+      post upvote_path(work)
+
+      # Assert
+      work.reload
+      expect(session[:user_id]).must_equal user.id
+      expect(work.vote_count).must_equal before_vote
+      must_redirect_to work_path(work)
     end
   end
 end

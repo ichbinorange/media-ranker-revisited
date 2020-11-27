@@ -45,7 +45,7 @@ describe UsersController do
       must_respond_with :redirect
     end
 
-    it "can log in a new user" do
+    it "can log in a new user with valid user data" do
       # Arrange
       new_user = User.new(uid: "1111", username: "Test", provider: "github", email: "email@gmail.com")
 
@@ -61,7 +61,7 @@ describe UsersController do
       must_respond_with :redirect
     end
 
-    it "redirects to the login route if given invalid user data" do
+    it "redirects to root path if given invalid user data" do
       # Arrange
       start_count = User.count
     
