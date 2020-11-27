@@ -9,10 +9,6 @@ class UsersController < ApplicationController
     render_404 unless @user
   end
 
-  def login_form
-    # for view
-  end
-
   def create
     user = User.find_by(uid: auth_hash[:uid], provider: "github")
     
