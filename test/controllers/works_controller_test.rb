@@ -34,13 +34,21 @@ describe WorksController do
   INVALID_CATEGORIES = ["nope", "42", "", "  ", "albumstrailingtext"]
 
   describe "index" do
-    it "succeeds when there are works" do
+    it "succeeds when there are works for logged-in user" do
+      # Arrange
+      logged_in_user = perform_login(users(:dan))
+
+      # Act
       get works_path
 
+      # Assert
       must_respond_with :success
     end
 
-    it "succeeds when there are no works" do
+    it "succeeds when there are no works for logged-in user" do
+      # Arrange
+      logged_in_user = perform_login(users(:dan))
+
       Work.all do |work|
         work.destroy
       end
@@ -48,6 +56,14 @@ describe WorksController do
       get works_path
 
       must_respond_with :success
+    end
+
+    it "redirects to root_path for guest" do
+      # Act
+      get works_path
+
+      # Assert
+      must_redirect_to root_path
     end
   end
 
@@ -96,7 +112,10 @@ describe WorksController do
   end
 
   describe "show" do
-    it "succeeds for an extant work ID" do
+    it "succeeds for an extant work ID for logged-in user" do
+      # Arrange
+      logged_in_user = perform_login(users(:dan))
+
       get work_path(existing_work.id)
 
       must_respond_with :success
@@ -109,6 +128,12 @@ describe WorksController do
       get work_path(destroyed_id)
 
       must_respond_with :not_found
+    end
+
+    it "redirects to root_path for an extant work ID for guest" do
+      get work_path(existing_work.id)
+
+      must_redirect_to root_path
     end
   end
 

@@ -2,18 +2,30 @@ require "test_helper"
 
 describe UsersController do
   describe "index" do
-    it "can get the index path" do
+    it "can get the index path for logged-in user" do
+      # Arrange
+      user = perform_login(users(:dan))
+
       # Act
       get users_path
 
       # Assert
       must_respond_with :success
     end
+
+    it "cannot get the index path for guest" do
+      # Act
+      get users_path
+
+      # Assert
+      must_redirect_to root_path
+    end
   end
 
   describe "show" do
-    it "can get a valid user" do
+    it "can get a valid user for logged-in user" do
       # Arrange
+      logged_in_user = perform_login(users(:dan))
       user = users(:dan)
 
       # Act
@@ -32,6 +44,17 @@ describe UsersController do
     
       # Assert
       must_respond_with :not_found
+    end
+
+    it "cannot get a valid user for guest" do
+      # Arrange
+      user = users(:dan)
+
+      # Act
+      get user_path(user)
+
+      # Assert
+      must_redirect_to root_path
     end
   end
 
