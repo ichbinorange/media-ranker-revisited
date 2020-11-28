@@ -5,10 +5,15 @@ dan:
   uid: 12345
   email: dan@wonderful.net
   username: dan
-
+#  uid: 12345
+#  provider: github
+#  email: dan@dan.com
 kari:
   provider: github
   uid: 1234567
   email: kari@greenplant.net
   username: kari
+#  uid: 67890
+#  provider: github
+#  email: kari@kari.com
 
