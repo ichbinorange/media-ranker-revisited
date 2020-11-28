@@ -28,7 +28,7 @@ class WorksController < ApplicationController
 
     if @user.nil?
       flash[:result_text] = "You must log in to do that"
-      return redirect_back(fallback_location: root_path)
+      return render :new, status: :bad_request
     end
 
     @work.update(user_id: session[:user_id])
