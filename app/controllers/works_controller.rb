@@ -25,6 +25,13 @@ class WorksController < ApplicationController
   def create
     @work = Work.new(media_params)
     @media_category = @work.category
+
+    if @user.nil?
+      flash[:result_text] = "You must log in to do that"
+      return render :new, status: :bad_request
+    end
+
+    @work.update(user_id: session[:user_id])
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully created #{@media_category.singularize} #{@work.id}"
@@ -47,10 +54,23 @@ class WorksController < ApplicationController
   end
 
   def edit
+    if @user.nil?
+      flash[:result_text] = "You must log in to do that"
+      return redirect_to root_path
+    elsif @user.work_owner(params[:id]).nil?
+      flash[:result_text] = "Only the work's owner can edit it."
+      return redirect_back(fallback_location: root_path)
+    end
   end
 
   def update
-    if @work.update(media_params)
+    if @user.nil?
+      flash[:result_text] = "You must log in to do that"
+      return redirect_to root_path
+    elsif @user.work_owner(params[:id]).nil?
+      flash[:result_text] = "Only the work's owner can edit it."
+      return redirect_back(fallback_location: root_path)
+    elsif @work.update(media_params)
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
       redirect_to work_path(@work)
@@ -63,6 +83,11 @@ class WorksController < ApplicationController
   end
 
   def destroy
+    if @user.work_owner(params[:id]).nil?
+      flash[:result_text] = "Only the work's owner can edit it."
+      return redirect_back(fallback_location: root_path)
+    end
+
     @work.destroy
     flash[:status] = :success
     flash[:result_text] = "Successfully destroyed #{@media_category.singularize} #{@work.id}"
