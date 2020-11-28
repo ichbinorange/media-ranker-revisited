@@ -17,71 +17,85 @@ describe Work do
         expect(user).must_be_kind_of User
       end
     end
+
+    it "can set user by using User" do
+      user = users(:dan)
+      album = works(:album)
+      expect(album.user).must_equal user
+    end
   end
 
   describe "validations" do
-    it "allows the three valid categories" do
+    it "allows the three valid categories with an associated user" do
+      user = users(:dan)
       valid_categories = ["album", "book", "movie"]
       valid_categories.each do |category|
-        work = Work.new(title: "test", category: category)
+        work = Work.new(title: "test", category: category, user_id: user.id)
         expect(work.valid?).must_equal true
       end
     end
 
     it "fixes almost-valid categories" do
+      user = users(:dan)
       categories = ["Album", "albums", "ALBUMS", "books", "mOvIeS"]
       categories.each do |category|
-        work = Work.new(title: "test", category: category)
+        work = Work.new(title: "test", category: category, user_id: user.id)
         expect(work.valid?).must_equal true
         expect(work.category).must_equal category.singularize.downcase
       end
     end
 
     it "rejects invalid categories" do
+      user = users(:dan)
       invalid_categories = ["cat", "dog", "phd thesis", 1337, nil]
       invalid_categories.each do |category|
-        work = Work.new(title: "test", category: category)
+        work = Work.new(title: "test", category: category, user_id: user.id)
         expect(work.valid?).must_equal false
         expect(work.errors.messages).must_include :category
       end
     end
 
     it "requires a title" do
-      work = Work.new(category: "ablum")
+      user = users(:dan)
+      work = Work.new(category: "ablum", user_id: user.id)
       expect(work.valid?).must_equal false
       expect(work.errors.messages).must_include :title
     end
 
     it "requires unique names w/in categories" do
+      user = users(:dan)
       category = "album"
       title = "test title"
-      work1 = Work.new(title: title, category: category)
+      work1 = Work.new(title: title, category: category, user_id: user.id)
       work1.save!
 
-      work2 = Work.new(title: title, category: category)
+      work2 = Work.new(title: title, category: category, user_id: user.id)
       expect(work2.valid?).must_equal false
       expect(work2.errors.messages).must_include :title
     end
 
     it "does not require a unique name if the category is different" do
+      user = users(:dan)
       title = "test title"
-      work1 = Work.new(title: title, category: "album")
+      work1 = Work.new(title: title, category: "album", user_id: user.id)
       work1.save!
 
-      work2 = Work.new(title: title, category: "book")
+      work2 = Work.new(title: title, category: "book", user_id: user.id)
       expect(work2.valid?).must_equal true
     end
   end
 
   describe "vote_count" do
     it "defaults to 0" do
-      work = Work.create!(title: "test title", category: "movie")
+      user = users(:dan)
+      work = Work.create!(title: "test title", category: "movie", user_id: user.id)
       expect(work).must_respond_to :vote_count
       expect(work.vote_count).must_equal 0
     end
 
     it "tracks the number of votes" do
-      work = Work.create!(title: "test title", category: "movie")
+      user = users(:dan)
+      work = Work.create!(title: "test title", category: "movie", user_id: user.id)
       4.times do |i|
         user = User.create!(username: "user#{i}")
         Vote.create!(user: user, work: work)
@@ -99,11 +113,12 @@ describe Work do
       20.times do |i|
         test_users << User.create!(username: "user#{i}")
       end
-
+  
       # Create media to vote upon
       Work.where(category: "movie").destroy_all
       8.times do |i|
-        work = Work.create!(category: "movie", title: "test movie #{i}")
+        work = Work.create!(category: "movie", title: "test movie #{i}", user_id: test_users[i].id)
+        
         vote_count = rand(test_users.length)
         test_users.first(vote_count).each do |user|
           Vote.create!(work: work, user: user)
@@ -130,16 +145,17 @@ describe Work do
     end
 
     it "returns at most 10 items" do
+      user = users(:dan)
       movies = Work.top_ten("movie")
       expect(movies.length).must_equal 8
 
-      Work.create(title: "phase 2 test movie 1", category: "movie")
+      Work.create(title: "phase 2 test movie 1", category: "movie", user_id: user.id)
       expect(Work.top_ten("movie").length).must_equal 9
 
-      Work.create(title: "phase 2 test movie 2", category: "movie")
+      Work.create(title: "phase 2 test movie 2", category: "movie", user_id: user.id)
       expect(Work.top_ten("movie").length).must_equal 10
 
-      Work.create(title: "phase 2 test movie 3", category: "movie")
+      Work.create(title: "phase 2 test movie 3", category: "movie", user_id: user.id)
       expect(Work.top_ten("movie").length).must_equal 10
     end
   end
