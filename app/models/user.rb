@@ -5,6 +5,10 @@ class User < ApplicationRecord
 
   validates :username, uniqueness: true, presence: true
 
+  def work_owner(work)
+    self.works.find_by(id: work)
+  end
+
   def self.build_from_github(auth_hash)
     user = User.new
     user.uid = auth_hash["uid"]

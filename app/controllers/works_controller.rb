@@ -57,7 +57,7 @@ class WorksController < ApplicationController
     if @user.nil?
       flash[:result_text] = "You must log in to do that"
       return redirect_to root_path
-    elsif @user.id != @work.user_id
+    elsif @user.work_owner(params[:id]).nil?
       flash[:result_text] = "Only the work's owner can edit it."
       return redirect_back(fallback_location: root_path)
     end
@@ -67,7 +67,7 @@ class WorksController < ApplicationController
     if @user.nil?
       flash[:result_text] = "You must log in to do that"
       return redirect_to root_path
-    elsif @user.id != @work.user_id
+    elsif @user.work_owner(params[:id]).nil?
       flash[:result_text] = "Only the work's owner can edit it."
       return redirect_back(fallback_location: root_path)
     elsif @work.update(media_params)
@@ -83,7 +83,7 @@ class WorksController < ApplicationController
   end
 
   def destroy
-    if @user.id != @work.user_id
+    if @user.work_owner(params[:id]).nil?
       flash[:result_text] = "Only the work's owner can edit it."
       return redirect_back(fallback_location: root_path)
     end
